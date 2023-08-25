@@ -50,7 +50,7 @@ class ReactShareViewController: ShareViewController, RCTBridgeDelegate, ReactSha
   }
 
   override func viewDidDisappear(_ animated: Bool) {
-    cancel()
+    cancelRequest()
     ShareMenuReactView.detachViewDelegate()
   }
 
