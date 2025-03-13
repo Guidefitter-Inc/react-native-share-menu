@@ -9,6 +9,7 @@
 
 import RNShareMenu
 
+@available(iOSApplicationExtension, unavailable) // Added this to support open host app from iOS 18
 class ReactShareViewController: ShareViewController, RCTBridgeDelegate, ReactShareViewDelegate {
   func sourceURL(for bridge: RCTBridge!) -> URL! {
 #if DEBUG
