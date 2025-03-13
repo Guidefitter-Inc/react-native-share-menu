@@ -16,6 +16,7 @@ import RNShareMenu
 
 // ************* Changes to avoid initial stupid view with text and small photo ****************** //
 // SLComposeServiceViewController -> UIViewController
+@available(iOSApplicationExtension, unavailable) // Added this to support open host app from iOS 18
 class ShareViewController: UIViewController {
   var hostAppId: String?
   var hostAppUrlScheme: String?
@@ -52,7 +53,8 @@ class ShareViewController: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
-    completeRequest()
+    // Added "success: true" to support open host app from iOS 18
+    completeRequest(success: true)
   }
 
   // *********** Commented this due to avoid initial stupid view *************** //
@@ -243,22 +245,29 @@ class ShareViewController: UIViewController {
       exit(withError: NO_INFO_PLIST_URL_SCHEME_ERROR)
       return
     }
-
-    let url = URL(string: urlScheme)
-    let selectorOpenURL = sel_registerName("openURL:")
-    var responder: UIResponder? = self
-
-    while responder != nil {
-      if responder?.responds(to: selectorOpenURL) == true {
-        responder?.perform(selectorOpenURL, with: url)
-      }
-      responder = responder!.next
+    // Added this to support open host app from iOS 18
+    guard let url = URL(string: urlScheme) else {
+        exit(withError: NO_INFO_PLIST_URL_SCHEME_ERROR)
+        return //be safe
     }
+   
+    UIApplication.shared.open(url, options: [:], completionHandler: completeRequest)
+    // let url = URL(string: urlScheme)
+    // let selectorOpenURL = sel_registerName("openURL:")
+    // var responder: UIResponder? = self
 
-    completeRequest()
+    // while responder != nil {
+    //   if responder?.responds(to: selectorOpenURL) == true {
+    //     responder?.perform(selectorOpenURL, with: url)
+    //   }
+    //   responder = responder!.next
+    // }
+
+    // completeRequest()
   }
 
-  func completeRequest() {
+  // Added "success: Bool" to support open host app from iOS 18
+  func completeRequest(success: Bool) {
     // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
     extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
   }
